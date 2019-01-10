@@ -1,0 +1,101 @@
+$medium: "(max-width: 800px)";
+
+*
+  box-sizing: border-box
+  margin: 0
+  padding: 0
+
+body
+  background-color: black
+
+@font-face
+  font-family: 'SinkinSans-200XLight'
+  src: local('SinkinSans-200XLight'), url('./assets/sinkin-sans/SinkinSans-200XLight.woff') format('woff')
+
+.app
+  display: flex
+  width: 50vw
+  height: 100vh
+  justify-content: center
+  align-items: center
+  margin: 0 auto
+  font-weight: 100
+  font-size: 1.8rem
+  font-family: 'SinkinSans-200XLight', 'ubuntu-mono'
+
+
+.js-calc
+  box-shadow: 0px 2px 51px 19px rgba(255,255,255,1)
+  width: 100%
+  height: 80%
+  display: flex
+  flex-direction: column
+  max-width: 480px
+  max-height: 730px
+
+
+.display
+  height: 35%
+  width: 100%
+  display: flex
+
+.keyboard
+  height: 65%
+  width: 100%
+  display: flex
+  flex-direction: column
+
+
+.keyboard__keyboard-row-key
+  height: 20%
+  width: 100%
+  display: flex
+
+.keyboard__keyboard-row-key__key-btn
+	width: 25%
+	height: 100%
+	display: flex
+	justify-content: center
+	align-items: center
+	border: 0.5px solid black
+.keyboard__keyboard-row-key__key-btn:hover
+	border: 0.5px solid white
+
+.keyboard__keyboard-row-key__key-btn--double
+  width: 50%
+  display: flex
+  justify-content:  flex-start
+  .keyboard__keyboard-row-key__key-btn__symbol
+	  width: 50%
+
+
+.keyboard__keyboard-row-key__key-btn__symbol
+	width: 33%
+	height: 33%
+	color: white
+	text-align: center
+
+.keyboard__keyboard-row-key__key-btn--deletion-btn
+	background-color: darkgray
+	.keyboard__keyboard-row-key__key-btn__symbol
+		color: black
+
+.keyboard__keyboard-row-key__key-btn--deletion-btn:hover
+	.keyboard__keyboard-row-key__key-btn__symbol
+	  color: white
+
+.keyboard__keyboard-row-key__key-btn--operation-btn
+	background-color: #FF7809
+
+
+.keyboard__keyboard-row-key__key-btn--number-btn
+	background-color: #C9C7C5
+	.keyboard__keyboard-row-key__key-btn__symbol
+	  color: black
+
+.keyboard__keyboard-row-key__key-btn--number-btn:hover
+	.keyboard__keyboard-row-key__key-btn__symbol
+	  color: white
+
+
+
