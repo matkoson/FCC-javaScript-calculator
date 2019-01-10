@@ -8,9 +8,10 @@ class Display extends Component {
     return (
       <div className="display">
         <div className="display__secondary-display">
-          <div className="display__primary-display">
-            {this.props.currDisplay}7
-          </div>
+          {this.props.secondaryDisplay}
+        </div>
+        <div className="display__primary-display">
+          {this.props.primaryDisplay}
         </div>
       </div>
     );
