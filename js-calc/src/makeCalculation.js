@@ -1,4 +1,5 @@
 function makeCalculation(arr) {
+  console.log(arr);
   let result = 0,
     operation;
   if (
@@ -21,7 +22,7 @@ function makeCalculation(arr) {
     } else if (arr[i] === "x") {
       operation = "multi";
       continue;
-    } else if (arr[i] == "÷") {
+    } else if (arr[i] === "÷") {
       operation = "div";
       continue;
     }

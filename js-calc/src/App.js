@@ -11,20 +11,21 @@ class App extends Component {
     this.state = {
       currStr: "",
       inputCalc: [],
-      priorityCalc: [],
       currDisplay: "",
       entireInput: "",
       result: ""
     };
     this.genericHandler = this.genericHandler.bind(this);
-    this.numberHandler = this.numberHandler.bind(this);
     this.operatorHandler = this.operatorHandler.bind(this);
     this.deletionHandler = this.deletionHandler.bind(this);
     this.sumHandler = this.sumHandler.bind(this);
+    this.prioritySumHandler = this.prioritySumHandler.bind(this);
+    //
+    //
   }
   genericHandler(event) {
-    // console.log(this.state.currDisplay);
     let curDis = this.state.currDisplay;
+    //here
     if (
       curDis[curDis.length - 1] === "-" ||
       curDis[curDis.length - 1] === "+" ||
@@ -33,6 +34,7 @@ class App extends Component {
     ) {
       return this.setState({ currDisplay: event.currentTarget.id });
     }
+    console.log(this.state.currDisplay);
     let val = event.currentTarget.id,
       newInput = this.state.currDisplay.concat(val);
     this.setState({
@@ -44,32 +46,42 @@ class App extends Component {
 
     if (this.state.entireInput.length > 20) this.setState({ entireInput: "" });
   }
-  numberHandler(event) {
-    this.setState({
-      currStr: this.state.currStr.concat(event.currentTarget.id)
-    });
-  }
   operatorHandler(event) {
-    if (this.state.currDisplay.length <= 1)
-      return this.setState({ currDisplay: event.currentTarget.id });
-    console.log(this.state.inputCalc);
     let curDis = this.state.currDisplay,
-      popOne,
-      operatorType = event.currentTarget.id;
+      popOne;
+    let iC = this.state.inputCalc,
+      len = iC.length;
+
+    let lastOperator = iC[len - 1],
+      valBefore = iC[len - 2];
     //
+    console.log("operator", iC[len - 1]);
+    if (iC[len - 1] === "x" || iC[len - 1] === "÷") {
+      return this.prioritySumHandler(
+        valBefore,
+        lastOperator,
+        curDis,
+        event.currentTarget.id
+      );
+    }
+    //
+    //
+    // if (this.state.currDisplay.length <= 1)
+    //   return this.setState({ currDisplay: event.currentTarget.id });
     if (
       curDis[curDis.length - 1] !== "-" &&
-      curDis[curDis.length - 1] !== "+" &&
-      curDis[curDis.length - 1] !== "x" &&
-      curDis[curDis.length - 1] !== "÷"
+      curDis[curDis.length - 1] !== "+"
     ) {
-      if (operatorType === "x" || operatorType === "÷") {
-        this.prioritySumHandler(operatorType);
-      } else {
-        this.state.inputCalc.push(this.state.currDisplay);
-        this.state.inputCalc.push(event.currentTarget.id);
-        return this.setState({ currDisplay: event.currentTarget.id });
-      }
+      //if the last char in the currentDisp is NOT an operator of any kind =add to inputCalc arr the currDisp val + the operator itself
+      this.setState({
+        currDisplay: event.currentTarget.id,
+        inputCalc: [
+          ...this.state.inputCalc,
+          this.state.currDisplay,
+          event.currentTarget.id
+        ]
+      });
+      console.log(this.state.currDisplay);
     } else {
       this.state.inputCalc.pop();
       this.state.inputCalc.push(event.currentTarget.id);
@@ -82,9 +94,12 @@ class App extends Component {
     }
   }
   deletionHandler(event) {
+    //
     let val = event.currentTarget.id,
       popOne,
       currStr;
+    //
+    //
     if (val === "AC") {
       return this.setState({
         currDisplay: "",
@@ -94,12 +109,18 @@ class App extends Component {
         result: ""
       });
     }
+    //
+    //
     if (val === "Del") {
-      popOne = this.state.currDisplay.slice().split("");
-      popOne.pop();
-      popOne = popOne.join("");
-      return this.setState({ currDisplay: popOne, entireInput: popOne });
+      if (this.state.currDisplay.length > 0) {
+        popOne = this.state.currDisplay.slice().split("");
+        popOne.pop();
+        popOne = popOne.join("");
+        return this.setState({ currDisplay: popOne, entireInput: popOne });
+      }
     }
+    //
+    //
     if (val === "±") {
       console.log(this.state.currDisplay[0]);
       if (this.state.currDisplay[0] !== "-") {
@@ -114,24 +135,57 @@ class App extends Component {
         return this.setState({ currDisplay: popOne, entireInput: popOne });
       }
     }
+    //
+    //
   }
-  prioritySumHandler(operator, latestVal) {
-    this.state.priorityCalc.push(this.inputCalc.pop());
-    this.state.priorityCalc.push(operator);
-    this.state.priorityCalc.push(latestVal);
-    this.state.inputCalc.push(makeCalculation(this.state.priorityCalc));
-    if (this.state.inputCalc.length === 1) {
-      let sum = this.state.inputCalc[0];
+  sumHandler(event) {
+    let iC = this.state.inputCalc,
+      len = iC.length,
+      lastMultiDiv,
+      sum;
+    console.log(iC[len - 1], "sum");
+    if (iC[len - 1] === "x" || iC[len - 1] === "÷") {
+      lastMultiDiv = makeCalculation([
+        iC[len - 2],
+        iC[len - 1],
+        this.state.currDisplay
+      ]);
+    }
+    //
+    let lastOp = iC[len - 2];
+    if (this.state.currDisplay.length && lastOp !== "÷" && lastOp !== "x")
+      iC.push(this.state.currDisplay);
+    if (len >= 3) {
+      console.log(lastMultiDiv);
+      //
+      if (lastMultiDiv) {
+        sum = makeCalculation([...iC.slice(0, len - 2), lastMultiDiv]);
+      } else {
+        sum = makeCalculation(iC);
+      }
+      //
+      if (sum % 1 !== 0) sum = sum.toFixed(1);
       this.setState({ inputCalc: [], currDisplay: sum });
+    } else {
+      this.setState({
+        inputCalc: [],
+        currDisplay: iC[0]
+      });
     }
   }
-  sumHandler() {
-    if (this.state.currDisplay.length)
-      this.state.inputCalc.push(this.state.currDisplay);
-    if (this.state.inputCalc.length >= 3) {
-      const sum = makeCalculation(this.state.inputCalc);
-      this.setState({ inputCalc: [], currDisplay: sum });
-    }
+  prioritySumHandler(valBef, op, valAf, currOp) {
+    let successorVal = makeCalculation([valBef, op, valAf]);
+    if (successorVal % 1 !== 0) successorVal = successorVal.toFixed(1);
+    //
+    //
+    return this.setState({
+      inputCalc: [
+        ...this.state.inputCalc.slice(0, this.state.inputCalc.length - 3),
+        successorVal,
+        currOp
+      ],
+      currDisplay: currOp
+    });
   }
   render() {
     return (
@@ -318,7 +372,7 @@ class App extends Component {
               <div
                 id="."
                 className="keyboard__keyboard-row-key__key-btn keyboard__keyboard-row-key__key-btn--number-btn"
-                onClick={this.numberHandler}
+                onClick={this.genericHandler}
               >
                 <span className="keyboard__keyboard-row-key__key-btn__symbol">
                   .
