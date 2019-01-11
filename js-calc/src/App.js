@@ -9,11 +9,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currStr: "",
-      inputCalc: [],
-      currDisplay: "",
-      entireInput: "",
-      result: ""
+      inputCalc: [], //the arr for keeping all the operators and numbers
+      currDisplay: "", //the value currently displayed on the primary display
+      entireInput: "" //the value displayed on the secondary display
     };
     this.genericHandler = this.genericHandler.bind(this);
     this.operatorHandler = this.operatorHandler.bind(this);
@@ -32,62 +30,60 @@ class App extends Component {
       curDis[curDis.length - 1] === "x" ||
       curDis[curDis.length - 1] === "÷"
     ) {
+      //if I'm currently in middle of operation =[val1, operator, null], the primary display should show the currently typed in number, which should be added to the entire equation at the secondary display
       return this.setState({
         currDisplay: event.currentTarget.id,
         entireInput: this.state.entireInput.concat(event.currentTarget.id)
       });
     }
-    console.log(this.state.currDisplay);
     let val = event.currentTarget.id,
       newInput = this.state.currDisplay.concat(val);
     this.setState({
       currDisplay: newInput,
       entireInput: newInput
-    });
+    }); //if it's only a beginning of an operation, add the next num to the current string on both primary and secondary
 
-    if (this.state.currDisplay.length > 8) this.setState({ currDisplay: "" });
+    if (this.state.currDisplay.length > 8) this.setState({ currDisplay: "" }); //controlling the max-length
 
     if (this.state.entireInput.length > 20) this.setState({ entireInput: "" });
   }
   operatorHandler(event) {
     let curDis = this.state.currDisplay,
-      popOne;
-    let iC = this.state.inputCalc,
-      len = iC.length;
-
-    let lastOperator = iC[len - 1],
+      popOne,
+      iC = this.state.inputCalc,
+      len = iC.length,
+      lastOperator = iC[len - 1],
       valBefore = iC[len - 2];
     //
-    console.log("operator", iC[len - 1]);
+    //
     if (iC[len - 1] === "x" || iC[len - 1] === "÷") {
+      //if I'm in the middle of the multi/div operation
       return this.prioritySumHandler(
         valBefore,
         lastOperator,
         curDis,
         event.currentTarget.id
       );
+      //pass to the priorityHandler the last three vals in the this.state.inputCalc, in order to make the calculation beforehand, so that the order of precedence could be sustained
     }
-    //
-    //
-    // if (this.state.currDisplay.length <= 1)
-    //   return this.setState({ currDisplay: event.currentTarget.id });
     if (
       curDis[curDis.length - 1] !== "-" &&
       curDis[curDis.length - 1] !== "+"
     ) {
-      //if the last char in the currentDisp is NOT an operator of any kind =add to inputCalc arr the currDisp val + the operator itself
+      //if the last char in the currentDisp is NOT an operator of any kind(the other two operators are covered above) =add to inputCalc arr the currDisp val + the operator itself
       let newIc = [
-        ...this.state.inputCalc,
+        ...this.state.inputCalc, //spread, so that commas wouldn't be seen on the secondary
         this.state.currDisplay,
         event.currentTarget.id
       ];
+      //adding the currently held val from the primary and the latest idVal to the this.state.inputCalc
       this.setState({
         currDisplay: event.currentTarget.id,
         inputCalc: newIc,
         entireInput: newIc
       });
-      console.log(this.state.currDisplay);
     } else {
+      //if what I have is another operator at the last input, I can't have two operators in a row, so I need to replace it with a new one
       this.state.inputCalc.pop();
       this.state.inputCalc.push(event.currentTarget.id);
       popOne = this.state.currDisplay.slice().split("");
@@ -99,12 +95,12 @@ class App extends Component {
     }
   }
   deletionHandler(event) {
-    //
     let val = event.currentTarget.id,
       popOne,
       currStr;
     //
     //
+    //clearing all inputs and displays
     if (val === "AC") {
       return this.setState({
         currDisplay: "",
@@ -117,6 +113,7 @@ class App extends Component {
     //
     //
     if (val === "Del") {
+      //removing the last char from both displays =no need for altering iC, as it's not updated with the new val yet
       if (this.state.currDisplay.length > 0) {
         popOne = this.state.currDisplay.slice().split("");
         popOne.pop();
@@ -126,29 +123,28 @@ class App extends Component {
     }
     //
     //
+    //adding minus in front, or getting rid of it, which is equivalent to the positive value
     if (val === "±") {
-      console.log(this.state.currDisplay[0]);
       if (this.state.currDisplay[0] !== "-") {
         currStr = `-${this.state.currDisplay}`;
-        console.log(currStr);
         return this.setState({ currDisplay: currStr, entireInput: currStr });
       } else {
         popOne = this.state.currDisplay.slice().split("");
         popOne.shift();
         popOne = popOne.join("");
-        console.log(popOne);
         return this.setState({ currDisplay: popOne, entireInput: popOne });
       }
     }
-    //
-    //
   }
   sumHandler(event) {
     let iC = this.state.inputCalc,
       len = iC.length,
       lastMultiDiv,
-      sum;
-    console.log(iC[len - 1], "sum");
+      sum,
+      lastOp;
+    //
+    //
+    //
     if (iC[len - 1] === "x" || iC[len - 1] === "÷") {
       lastMultiDiv = makeCalculation([
         iC[len - 2],
@@ -156,23 +152,27 @@ class App extends Component {
         this.state.currDisplay
       ]);
     }
+    //using calc algorithm to pre-calc all of the multi/div operations, in order to maintain precedence. That's the only case where it hasn't been handled earlier
     //
-    let lastOp = iC[len - 2];
+    lastOp = iC[len - 2];
     if (this.state.currDisplay.length && lastOp !== "÷" && lastOp !== "x")
+      //if the last operator is of type add/sub, the num following it is still kept at the primary display, but still not moved to the this.state.inputCalc
       iC.push(this.state.currDisplay);
     if (len > 1) {
-      console.log(lastMultiDiv);
       //
       if (lastMultiDiv) {
+        //if I had to take care of the last multi/div, I can't put it on state with this.setState, as it won't be avail immed, the result needs to be kept in a sep var, and passed this way to the calc algorithm
         sum = makeCalculation([...iC.slice(0, len - 2), lastMultiDiv]);
       } else {
+        //if that's not the case, I proceed with passing the whole this.state.inputCalc into the calc algorithm
         sum = makeCalculation(iC);
       }
       //
       if (sum % 1 !== 0) sum = sum.toFixed(1);
+      //if the division leaves some rest behind, I need to round it up
       this.setState({ inputCalc: [], currDisplay: sum });
     } else {
-      // if()
+      //if there's only one num typed in, the result symbol will yield only it
       this.setState({
         inputCalc: [],
         currDisplay: iC[0]
@@ -192,6 +192,7 @@ class App extends Component {
       ],
       currDisplay: currOp
     });
+    //retainin the latest operator, which has to be done her, coz it's omitted at the handleSum(), when execution pre-calc of multi/div
   }
   render() {
     return (
