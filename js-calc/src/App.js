@@ -32,7 +32,10 @@ class App extends Component {
       curDis[curDis.length - 1] === "x" ||
       curDis[curDis.length - 1] === "÷"
     ) {
-      return this.setState({ currDisplay: event.currentTarget.id });
+      return this.setState({
+        currDisplay: event.currentTarget.id,
+        entireInput: this.state.entireInput.concat(event.currentTarget.id)
+      });
     }
     console.log(this.state.currDisplay);
     let val = event.currentTarget.id,
@@ -73,13 +76,15 @@ class App extends Component {
       curDis[curDis.length - 1] !== "+"
     ) {
       //if the last char in the currentDisp is NOT an operator of any kind =add to inputCalc arr the currDisp val + the operator itself
+      let newIc = [
+        ...this.state.inputCalc,
+        this.state.currDisplay,
+        event.currentTarget.id
+      ];
       this.setState({
         currDisplay: event.currentTarget.id,
-        inputCalc: [
-          ...this.state.inputCalc,
-          this.state.currDisplay,
-          event.currentTarget.id
-        ]
+        inputCalc: newIc,
+        entireInput: newIc
       });
       console.log(this.state.currDisplay);
     } else {
@@ -155,7 +160,7 @@ class App extends Component {
     let lastOp = iC[len - 2];
     if (this.state.currDisplay.length && lastOp !== "÷" && lastOp !== "x")
       iC.push(this.state.currDisplay);
-    if (len >= 3) {
+    if (len > 1) {
       console.log(lastMultiDiv);
       //
       if (lastMultiDiv) {
@@ -167,6 +172,7 @@ class App extends Component {
       if (sum % 1 !== 0) sum = sum.toFixed(1);
       this.setState({ inputCalc: [], currDisplay: sum });
     } else {
+      // if()
       this.setState({
         inputCalc: [],
         currDisplay: iC[0]
