@@ -10,7 +10,7 @@ class Display extends Component {
         <div className="display__secondary-display">
           {this.props.secondaryDisplay}
         </div>
-        <div className="display__primary-display">
+        <div id="display" className="display__primary-display">
           {this.props.primaryDisplay}
         </div>
       </div>
