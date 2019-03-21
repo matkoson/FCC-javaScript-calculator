@@ -7,14 +7,27 @@ import makeCalculation from "./makeCalculation";
 
 const nonNums = ["+", "-", "x", "/", "=", "±"];
 const operators = ["+", "-", "*", "/"];
+const basicOps = ["+", "-"];
 const priorityOps = ["*", "/"];
+const customEval = string => {
+  const len = string.length;
+  console.log("PRE", string);
+  string = string[0] === "0" ? string.slice(1) : string;
+  string =
+    operators.includes(string[len - 1]) || string[len - 1] === "."
+      ? string.slice(0, len - 1)
+      : string;
+  console.log("POST", string);
+  return String(eval(String(string)));
+};
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       inputCalc: "", //3.
       potentialVal: "", //2.
-      currDisplay: "0" //1.
+      currDisplay: "0", //1.
+      previousVal: ""
     };
     this.handleNumKeyClick = this.handleNumKeyClick.bind(this);
     this.handleOperatorClick = this.handleOperatorClick.bind(this);
@@ -25,49 +38,80 @@ class App extends Component {
     const { inputCalc, potentialVal, currDisplay } = this.state;
     const payload = e.currentTarget.dataset.calcdata;
     const prevToken = currDisplay[currDisplay.length - 1];
-    if (currDisplay === "0") {
-      return this.setState({ currDisplay: payload, potentialVal: payload });
-    }
-    if (!priorityOps.includes(prevToken)) {
-      if (!operators.includes(prevToken)) {
-        return this.setState(state => {
-          return {
-            currDisplay: state.currDisplay + payload,
-            potentialVal: state.potentialVal + payload
-          };
-        });
-      } else {
-        return this.setState(state => {
-          return {
-            currDisplay: payload,
-            potentialVal: state.potentialVal + payload
-          };
-        });
-      }
-    } else {
-      const toEval = eval(`${inputCalc.slice(inputCalc.length - 2)}${payload}`);
+
+    if (potentialVal.includes("*") || potentialVal.includes("/")) {
       return this.setState(state => {
         return {
-          potentialVal: String(toEval),
-          currDisplay: state.currDisplay + payload
+          currDisplay: state.currDisplay + payload,
+          potentialVal: state.potentialVal
+            ? state.potentialVal + payload
+            : state.previousVal + payload
         };
       });
     }
-  }
-  handleOperatorClick(e) {
-    const { currDisplay } = this.state;
-    const payload = e.currentTarget.dataset.calcdata;
-    const prevToken = currDisplay[currDisplay.length - 1];
-    if (operators.includes(prevToken)) {
-      return;
+    if (basicOps.includes(prevToken) || priorityOps.includes(prevToken)) {
+      return this.setState(state => {
+        return {
+          currDisplay: payload,
+          inputCalc: state.inputCalc + payload,
+          previousVal: payload
+        };
+      });
     }
-    return this.setState(state => {
+    this.setState(state => {
       return {
-        inputCalc: state.inputCalc + state.potentialVal + payload,
-        potentialVal: "",
-        currDisplay: payload
+        currDisplay:
+          state.currDisplay === "0" ? payload : state.currDisplay + payload,
+        inputCalc: state.inputCalc + payload,
+        previousVal: state.previousVal + payload
       };
     });
+  }
+  handleOperatorClick(e) {
+    const { currDisplay, potentialVal, inputCalc } = this.state;
+    const payload = e.currentTarget.dataset.calcdata;
+    const prevToken = currDisplay[currDisplay.length - 1];
+    const prevPotentialToken = potentialVal[potentialVal.length - 1];
+    const prevInputCalc = inputCalc[inputCalc.length - 1];
+    if (operators.includes(prevInputCalc)) {
+      return this.setState(state => {
+        return {
+          inputCalc:
+            state.inputCalc.slice(0, state.inputCalc.length - 1) + payload,
+          potentialVal: "",
+          currDisplay: payload
+        };
+      });
+    }
+    if (priorityOps.includes(payload)) {
+      return this.setState(state => {
+        return {
+          currDisplay: payload,
+          inputCalc: state.potentialVal
+            ? state.inputCalc + customEval(state.potentialVal)
+            : state.inputCalc,
+          potentialVal: state.previousVal + payload,
+          previousVal: state.currDisplay
+        };
+      });
+    }
+    if (basicOps.includes(payload)) {
+      return this.setState(state => {
+        return {
+          currDisplay: payload,
+          inputCalc: state.potentialVal
+            ? state.inputCalc.slice(
+                0,
+                state.inputCalc.length - state.previousVal.length
+              ) +
+              customEval(state.potentialVal) +
+              payload
+            : state.inputCalc + payload,
+          potentialVal: "",
+          previousVal: ""
+        };
+      });
+    }
   }
 
   render() {
@@ -85,7 +129,14 @@ class App extends Component {
                 id="clear"
                 data-calcdata="AC"
                 className="keyboard__keyboard-row-key__key-btn keyboard__keyboard-row-key__key-btn--deletion-btn"
-                onClick={this.deletionHandler}
+                onClick={() =>
+                  this.setState({
+                    inputCalc: "",
+                    currDisplay: "0",
+                    potentialVal: "",
+                    previousVal: ""
+                  })
+                }
               >
                 <span className="keyboard__keyboard-row-key__key-btn__symbol">
                   AC
@@ -94,7 +145,6 @@ class App extends Component {
               <div
                 data-calcdata="±"
                 className="keyboard__keyboard-row-key__key-btn keyboard__keyboard-row-key__key-btn--deletion-btn"
-                // onClick={()=>}
               >
                 <span className="keyboard__keyboard-row-key__key-btn__symbol">
                   ±
@@ -103,13 +153,13 @@ class App extends Component {
               <div
                 data-calcdata="Del"
                 className="keyboard__keyboard-row-key__key-btn keyboard__keyboard-row-key__key-btn--deletion-btn"
-                onClick={() =>
-                  this.setState({
-                    inputCalc: "0",
-                    currDisplay: "0"
-                  })
-                }
               >
+                {/* // onClick={() =></div>
+                //   this.setState({
+                //     inputCalc: "0",
+                //     currDisplay: "0"
+                //   })
+                // } */}
                 <span className="keyboard__keyboard-row-key__key-btn__symbol">
                   Del
                 </span>
@@ -121,7 +171,7 @@ class App extends Component {
                 onClick={this.handleOperatorClick}
               >
                 <span className="keyboard__keyboard-row-key__key-btn__symbol">
-                  ÷
+                  /
                 </span>
               </div>
             </div>
@@ -165,7 +215,7 @@ class App extends Component {
                 onClick={this.handleOperatorClick}
               >
                 <span className="keyboard__keyboard-row-key__key-btn__symbol">
-                  x
+                  *
                 </span>
               </div>
             </div>
@@ -274,7 +324,10 @@ class App extends Component {
                 id="decimal"
                 data-calcdata="."
                 className="keyboard__keyboard-row-key__key-btn keyboard__keyboard-row-key__key-btn--number-btn"
-                onClick={this.handleNumKeyClick}
+                onClick={e => {
+                  if (!this.state.currDisplay.includes("."))
+                    this.handleNumKeyClick(e);
+                }}
               >
                 <span className="keyboard__keyboard-row-key__key-btn__symbol">
                   .
@@ -285,15 +338,23 @@ class App extends Component {
                 id="equals"
                 className="keyboard__keyboard-row-key__key-btn keyboard__keyboard-row-key__key-btn--operation-btn"
                 onClick={() => {
-                  console.log(this.state.inputCalc);
-                  const { inputCalc } = this.state;
-                  const toEval = operators.includes(
-                    inputCalc[inputCalc.length - 1]
-                  )
-                    ? inputCalc.slice(0, inputCalc.length - 1)
-                    : inputCalc;
-                  this.setState({
-                    inputCalc: eval(String(toEval))
+                  let { inputCalc, potentialVal, previousVal } = this.state;
+                  potentialVal = potentialVal ? customEval(potentialVal) : null;
+                  console.log("ALERT", inputCalc);
+                  const result = potentialVal
+                    ? customEval(
+                        String(inputCalc).slice(
+                          0,
+                          inputCalc.length - previousVal.length
+                        ) + potentialVal
+                      )
+                    : customEval(inputCalc);
+                  this.setState(state => {
+                    return {
+                      inputCalc: result,
+                      currDisplay: result,
+                      previousVal: result
+                    };
                   });
                 }}
               >
