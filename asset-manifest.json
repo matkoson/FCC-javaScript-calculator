@@ -1,5 +1,5 @@
 {
-  "main.css": "/FCC-javaScript-calculator/static/css/main.7986362b.chunk.css",
+  "main.css": "/FCC-javaScript-calculator/static/css/main.72214483.chunk.css",
   "main.js": "/FCC-javaScript-calculator/static/js/main.8c158b97.chunk.js",
   "main.js.map": "/FCC-javaScript-calculator/static/js/main.8c158b97.chunk.js.map",
   "runtime~main.js": "/FCC-javaScript-calculator/static/js/runtime~main.55ec37ec.js",
@@ -7,8 +7,8 @@
   "static/js/2.800f60c1.chunk.js": "/FCC-javaScript-calculator/static/js/2.800f60c1.chunk.js",
   "static/js/2.800f60c1.chunk.js.map": "/FCC-javaScript-calculator/static/js/2.800f60c1.chunk.js.map",
   "index.html": "/FCC-javaScript-calculator/index.html",
-  "precache-manifest.0b8ff89794a7966cd9134b6d7db05388.js": "/FCC-javaScript-calculator/precache-manifest.0b8ff89794a7966cd9134b6d7db05388.js",
+  "precache-manifest.fddddb69e10b7bd109df59b160c7f6dd.js": "/FCC-javaScript-calculator/precache-manifest.fddddb69e10b7bd109df59b160c7f6dd.js",
   "service-worker.js": "/FCC-javaScript-calculator/service-worker.js",
-  "static/css/main.7986362b.chunk.css.map": "/FCC-javaScript-calculator/static/css/main.7986362b.chunk.css.map",
+  "static/css/main.72214483.chunk.css.map": "/FCC-javaScript-calculator/static/css/main.72214483.chunk.css.map",
   "static/media/SinkinSans-200XLight.woff": "/FCC-javaScript-calculator/static/media/SinkinSans-200XLight.8126f07c.woff"
 }

@@ -8,7 +8,7 @@ self.__precacheManifest = [
     "url": "/FCC-javaScript-calculator/static/js/runtime~main.55ec37ec.js"
   },
   {
-    "revision": "0e635a0b103cac710433",
+    "revision": "8ca61274726e27b1a1fc",
     "url": "/FCC-javaScript-calculator/static/js/main.8c158b97.chunk.js"
   },
   {
@@ -16,11 +16,11 @@ self.__precacheManifest = [
     "url": "/FCC-javaScript-calculator/static/js/2.800f60c1.chunk.js"
   },
   {
-    "revision": "0e635a0b103cac710433",
-    "url": "/FCC-javaScript-calculator/static/css/main.7986362b.chunk.css"
+    "revision": "8ca61274726e27b1a1fc",
+    "url": "/FCC-javaScript-calculator/static/css/main.72214483.chunk.css"
   },
   {
-    "revision": "e328364e555462673f73bd4837d1decf",
+    "revision": "0567ce19918fd235bf75dc93a0678663",
     "url": "/FCC-javaScript-calculator/index.html"
   }
 ];
