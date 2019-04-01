@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/FCC-javaScript-calculator/static/css/main.72214483.chunk.css"
   },
   {
-    "revision": "0567ce19918fd235bf75dc93a0678663",
+    "revision": "9d82f9eab15b5e34b65a75ba9e6c8897",
     "url": "/FCC-javaScript-calculator/index.html"
   }
 ];
